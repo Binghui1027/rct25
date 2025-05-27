@@ -14,7 +14,6 @@ header-includes:
   - \usepackage{graphicx}
   - \usepackage{float}
   - \usepackage{fontspec}
-  - \setmainfont{Arial}
   - \usepackage{placeins} 
   - \usepackage{longtable}
   - \usepackage{threeparttable}
@@ -57,7 +56,7 @@ This empirical analysis investigates financial differences between firms located
 - **equity ratio winsor**: Equity-to-assets ratio, winsorized at 1% and 99% to control for outliers
 
 ```{r}
-orbis_data <- readRDS("C:/Users/flg822822/Desktop/rct25/data/generated/orbis_berlin_data.rds")
+orbis_data <- readRDS("/workspaces/rct25/data/generated/orbis_berlin_data.rds")
 orbis_data <- orbis_data %>%
   filter(year %in% c(2019, 2020), !is.na(toas), !is.na(shfd), toas > 0) %>%
   mutate(
