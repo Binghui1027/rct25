@@ -1,0 +1,3 @@
+"Variable","n","mean","median","sd","var","min","max"
+"Log Total Assets",27908,13.624,13.705,2.321,5.386,0,24.904
+"Equity Ratio (Winsorized)",27908,0.142,0.367,1.389,1.929,-10.434,1

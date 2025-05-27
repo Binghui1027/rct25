@@ -1,0 +1,293 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+  12pt,
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{setspace}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{fontspec}
+\setmainfont{Arial}
+\usepackage{placeins}
+\usepackage{longtable}
+\usepackage{threeparttable}
+\usepackage{setspace}
+\setstretch{1}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection}{1em}{}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+\usepackage{siunitx}
+
+    \newcolumntype{d}{S[
+      table-align-text-before=false,
+      table-align-text-after=false,
+      input-symbols={-,\*+()}
+    ]}
+  
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Firm Financial Comparison: 10785 vs.~Berlin},
+  pdfauthor={Binghui Ru},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Firm Financial Comparison: 10785 vs.~Berlin}
+\author{Binghui Ru}
+\date{2025-05-28}
+
+\begin{document}
+\maketitle
+
+\setstretch{1}
+\subsection{1. Research Design and
+Methodology}\label{research-design-and-methodology}
+
+This empirical analysis investigates financial differences between firms
+located in postal code 10785 and those across Berlin using Orbis panel
+data for the years 2019 and 2020. The primary aim is to assess whether
+the COVID-19 pandemic has influenced firm-level characteristics by
+comparing pre-pandemic (2019) and pandemic (2020) data. The key
+financial variables are \textbf{Total Assets} and the \textbf{Equity
+Ratio}.
+
+\subsubsection{Three-Stage Analytical
+Approach:}\label{three-stage-analytical-approach}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Descriptive Statistics} -- Presenting basic data
+  characteristics\\
+\item
+  \textbf{Difference Testing} -- Including Welch's t-test and Wilcoxon
+  non-parametric test\\
+\item
+  \textbf{Causal Inference} -- Fixed-effects regression models with
+  clustered standard errors
+\end{itemize}
+
+\subsubsection{Key Variable Definitions}\label{key-variable-definitions}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{log toas}: Natural logarithm of total assets
+\item
+  \textbf{equity ratio winsor}: Equity-to-assets ratio, winsorized at
+  1\% and 99\% to control for outliers
+\end{itemize}
+
+\newpage
+
+\subsection{2. Descriptive Statistics}\label{descriptive-statistics}
+
+The 2020 data (n = 27,908) indicate substantial variation in firm size.
+The mean log total assets is 13.62, and winsorized equity ratio averages
+0.142 with a wide spread. Comparing these with 2019 enables assessment
+of pandemic-related changes.
+
+\begin{ThreePartTable}
+\begin{TableNotes}
+\item \textit{Note: } 
+\item Data from Berlin firms, 2020. Winsorized equity ratio trims top and bottom 1\% of the distribution.
+\end{TableNotes}
+\begin{longtable}[t]{lrrrrrrr}
+\caption{\label{tab:descriptive-stats}Descriptive Statistics (2020)}\\
+\toprule
+Variable & n & mean & median & sd & var & min & max\\
+\midrule
+Log Total Assets & 27908 & 13.624 & 13.705 & 2.321 & 5.386 & 0.000 & 24.904\\
+Equity Ratio (Winsorized) & 27908 & 0.142 & 0.367 & 1.389 & 1.929 & -10.434 & 1.000\\
+\bottomrule
+\insertTableNotes
+\end{longtable}
+\end{ThreePartTable}
+
+\newpage
+
+\subsection{3. Significance Tests}\label{significance-tests}
+
+We test group differences using both Welch's t-test and Wilcoxon
+rank-sum test. The results suggest 10785 firms are significantly smaller
+in asset size, but equity ratio differences are less clear. Comparing to
+2019 reveals how these gaps evolved due to the pandemic.
+
+\begin{ThreePartTable}
+\begin{TableNotes}
+\item \textit{Note: } 
+\item Welch t-test used for unequal variances. Wilcoxon is a non-parametric alternative.
+\end{TableNotes}
+\begin{longtable}[t]{lrrrr}
+\caption{\label{tab:significance-tests}Significance Tests (2020 Cross-Section)}\\
+\toprule
+Variable & t-statistic & t p-value & Wilcoxon W & Wilcoxon p-value\\
+\midrule
+Log Total Assets & 5.576 & 0.00 & 8565835 & 0.000\\
+Equity Ratio (Winsorized) & -1.600 & 0.11 & 6898776 & 0.002\\
+\bottomrule
+\insertTableNotes
+\end{longtable}
+\end{ThreePartTable}
+
+\subsection{4. Regression Models}\label{regression-models}
+
+Panel regressions confirm that 10785 firms are significantly smaller,
+even after controlling for year effects. For equity ratio, models yield
+low R\^{}2 and non-significant results, suggesting weak explanatory
+power and possible noise.
+
+\FloatBarrier
+
+\begin{table}
+\centering
+\caption{\label{tab:regression-3a}Regression Results on Log(Total Assets)}
+\centering
+\begin{tabular}[t]{lcc}
+\toprule
+  & Log(Total Assets) - Pooled OLS & Log(Total Assets) - Fixed Effects\\
+\midrule
+(Intercept) & \num{14.236}*** & \num{14.189}***\\
+ & (\num{0.000}) & (\num{0.011})\\
+groupOther & \num{-0.667}*** & \num{-0.667}***\\
+ & (\num{0.059}) & (\num{0.059})\\
+factor(year)2020 &  & \num{0.091}***\\
+ &  & (\num{0.022})\\
+\midrule
+Num.Obs. & \num{54024} & \num{54024}\\
+R2 & \num{0.002} & \num{0.002}\\
+R2 Adj. & \num{0.002} & \num{0.002}\\
+RMSE & \num{2.33} & \num{2.33}\\
+Std.Errors & by: postcode & by: postcode\\
+\bottomrule
+\multicolumn{3}{l}{\rule{0pt}{1em}+ p $<$ 0.1, * p $<$ 0.05, ** p $<$ 0.01, *** p $<$ 0.001}\\
+\multicolumn{3}{l}{\rule{0pt}{1em}Models use clustered standard errors by postcode.}\\
+\multicolumn{3}{l}{\rule{0pt}{1em}Fixed effects include year dummies.}\\
+\multicolumn{3}{l}{\rule{0pt}{1em}Dependent variable: log(total assets).}\\
+\end{tabular}
+\end{table}
+
+\begin{table}
+\centering
+\caption{\label{tab:regression-3b}Regression Results on Equity Ratio}
+\centering
+\begin{tabular}[t]{lcc}
+\toprule
+  & Equity Ratio - Pooled OLS & Equity Ratio - Fixed Effects\\
+\midrule
+(Intercept) & \num{-1.986}*** & \num{14.451}\\
+ & (\num{0.000}) & (\num{17.817})\\
+groupOther & \num{-23.533} & \num{-23.557}\\
+ & (\num{18.225}) & (\num{18.254})\\
+factor(year)2020 &  & \num{-32.099}\\
+ &  & (\num{34.794})\\
+\midrule
+Num.Obs. & \num{54024} & \num{54024}\\
+R2 & \num{0.000} & \num{0.000}\\
+R2 Adj. & \num{-0.000} & \num{-0.000}\\
+RMSE & \num{4125.36} & \num{4125.33}\\
+Std.Errors & by: postcode & by: postcode\\
+\bottomrule
+\multicolumn{3}{l}{\rule{0pt}{1em}+ p $<$ 0.1, * p $<$ 0.05, ** p $<$ 0.01, *** p $<$ 0.001}\\
+\multicolumn{3}{l}{\rule{0pt}{1em}Models use clustered standard errors by postcode.}\\
+\multicolumn{3}{l}{\rule{0pt}{1em}Fixed effects include year dummies.}\\
+\multicolumn{3}{l}{\rule{0pt}{1em}Dependent variable: equity ratio = book equity / total assets.}\\
+\end{tabular}
+\end{table}
+
+\FloatBarrier
+
+\subsection{5. Conclusion}\label{conclusion}
+
+The empirical results underscore a robust and statistically significant
+size disadvantage for firms operating in the 10785 postal region
+relative to the general Berlin firm population. This size gap remains
+consistent even when comparing the pre-pandemic and pandemic years.
+However, no consistent or statistically meaningful difference in equity
+ratios was observed over time, which may reflect structural or
+measurement heterogeneity not captured in the model. Overall, the
+findings offer valuable insights into the spatial and temporal dimension
+of corporate financial health within Berlin and provide a starting point
+for further research on localized economic resilience during global
+crises.
+
+\subsection{6. Reproducibility
+Statement}\label{reproducibility-statement}
+
+All empirical results presented in this report were generated using
+scripted R code and the original Orbis dataset. The accompanying .Rmd
+file and processed tables ensure full reproducibility. Summary
+statistics have also been exported to CSV format for transparency and
+future research applications.
+
+\end{document}

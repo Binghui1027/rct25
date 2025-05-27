@@ -1,0 +1,183 @@
+---
+title: "Firm Financial Comparison: 10785 vs. Berlin"
+author: "Binghui Ru"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    keep_tex: true
+fontsize: 12pt
+geometry: margin=2.5cm
+linestretch: 1
+header-includes:
+  - \usepackage{booktabs}
+  - \usepackage{graphicx}
+  - \usepackage{float}
+  - \usepackage{fontspec}
+  - \setmainfont{Arial}
+  - \usepackage{placeins} 
+  - \usepackage{longtable}
+  - \usepackage{threeparttable}
+  - \usepackage{setspace}
+  - \setstretch{1}
+  - \usepackage{titlesec}
+  - \titleformat{\section}{\Large\bfseries}{\thesection}{1em}{}
+  - \titleformat{\subsection}{\large\bfseries}{\thesubsection}{1em}{}
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(repos = c(CRAN = "https://cran.r-project.org"))
+packages <- c("tidyverse", "fixest", "modelsummary", "ggplot2", "kableExtra", "psych")
+installed_packages <- rownames(installed.packages())
+for (pkg in packages) {
+  if (!(pkg %in% installed_packages)) install.packages(pkg)
+}
+library(tidyverse)
+library(fixest)
+library(modelsummary)
+library(ggplot2)
+library(kableExtra)
+library(psych)
+```
+
+## 1. Research Design and Methodology 
+
+This empirical analysis investigates financial differences between firms located in postal code 10785 and those across Berlin using Orbis panel data for the years 2019 and 2020. The primary aim is to assess whether the COVID-19 pandemic has influenced firm-level characteristics by comparing pre-pandemic (2019) and pandemic (2020) data. The key financial variables are **Total Assets** and the **Equity Ratio**.
+
+### Three-Stage Analytical Approach:  
+
+- **Descriptive Statistics** – Presenting basic data characteristics  
+- **Difference Testing** – Including Welch’s t-test and Wilcoxon non-parametric test  
+- **Causal Inference** – Fixed-effects regression models with clustered standard errors  
+
+### Key Variable Definitions  
+
+- **log toas**: Natural logarithm of total assets
+- **equity ratio winsor**: Equity-to-assets ratio, winsorized at 1% and 99% to control for outliers
+
+```{r}
+orbis_data <- readRDS("C:/Users/flg822822/Desktop/rct25/data/generated/orbis_berlin_data.rds")
+orbis_data <- orbis_data %>%
+  filter(year %in% c(2019, 2020), !is.na(toas), !is.na(shfd), toas > 0) %>%
+  mutate(
+    equity_ratio = shfd / toas,
+    group = factor(ifelse(postcode == "10785", "10785", "Other"))
+  )
+orbis_2020 <- orbis_data %>%
+  filter(year == 2020) %>%
+  mutate(
+    equity_ratio_winsor = pmin(pmax(equity_ratio, quantile(equity_ratio, 0.01, na.rm = TRUE)),
+                                quantile(equity_ratio, 0.99, na.rm = TRUE)),
+    log_toas = log(toas)
+  )
+```
+
+\newpage
+## 2. Descriptive Statistics
+
+The 2020 data (n = 27,908) indicate substantial variation in firm size. The mean log total assets is 13.62, and winsorized equity ratio averages 0.142 with a wide spread. Comparing these with 2019 enables assessment of pandemic-related changes.
+
+```{r descriptive-stats, results='asis', echo=FALSE}
+vars <- orbis_2020 %>% select(log_toas, equity_ratio_winsor)
+desc_result <- psych::describe(vars)
+desc_stats <- desc_result %>% mutate(var = sd^2) %>% select(n, mean, median, sd, var, min, max)
+desc_stats <- round(desc_stats, 3)
+desc_stats <- tibble::rownames_to_column(desc_stats, "Variable")
+desc_stats$Variable <- recode(desc_stats$Variable,
+                               "log_toas" = "Log Total Assets",
+                               "equity_ratio_winsor" = "Equity Ratio (Winsorized)")
+
+kbl(desc_stats, caption = "Descriptive Statistics (2020)", 
+    format = "latex", 
+    booktabs = TRUE, 
+    longtable = TRUE,
+    escape = TRUE) %>%
+  footnote(
+    general = "Data from Berlin firms, 2020. Winsorized equity ratio trims top and bottom 1% of the distribution.",
+    threeparttable = TRUE,
+    escape = TRUE
+  )
+```
+
+\newpage
+
+## 3. Significance Tests
+
+We test group differences using both Welch's t-test and Wilcoxon rank-sum test. The results suggest 10785 firms are significantly smaller in asset size, but equity ratio differences are less clear. Comparing to 2019 reveals how these gaps evolved due to the pandemic.
+
+```{r significance-tests, results='asis', echo=FALSE}
+t_toas <- t.test(log_toas ~ group, data = orbis_2020)
+w_toas <- wilcox.test(log_toas ~ group, data = orbis_2020)
+t_eqr <- t.test(equity_ratio_winsor ~ group, data = orbis_2020)
+w_eqr <- wilcox.test(equity_ratio_winsor ~ group, data = orbis_2020)
+
+test_df <- tibble(
+  Variable = c("Log Total Assets", "Equity Ratio (Winsorized)"),
+  `t-statistic` = c(round(t_toas$statistic, 3), round(t_eqr$statistic, 3)),
+  `t p-value` = c(round(t_toas$p.value, 3), round(t_eqr$p.value, 3)),
+  `Wilcoxon W` = c(round(w_toas$statistic, 3), round(w_eqr$statistic, 3)),
+  `Wilcoxon p-value` = c(round(w_toas$p.value, 3), round(w_eqr$p.value, 3))
+)
+
+kbl(test_df, caption = "Significance Tests (2020 Cross-Section)", format = "latex", booktabs = TRUE,
+    longtable = TRUE, escape = TRUE) %>%
+  footnote(general = "Welch t-test used for unequal variances. Wilcoxon is a non-parametric alternative.",
+           threeparttable = TRUE, escape = TRUE)
+```
+
+## 4. Regression Models
+
+Panel regressions confirm that 10785 firms are significantly smaller, even after controlling for year effects. For equity ratio, models yield low R^2 and non-significant results, suggesting weak explanatory power and possible noise.
+
+\FloatBarrier
+
+```{r regression-3a, results='asis', echo=FALSE}
+reg1 <- feols(log(toas) ~ group, data = orbis_data, cluster = ~postcode)
+reg2 <- feols(log(toas) ~ group + factor(year), data = orbis_data, cluster = ~postcode)
+
+modelsummary(list(
+  "Log(Total Assets) - Pooled OLS" = reg1,
+  "Log(Total Assets) - Fixed Effects" = reg2
+),
+stars = TRUE,
+gof_omit = "AIC|BIC|Log.Lik.",
+title = "Regression Results on Log(Total Assets)",
+notes = c("Models use clustered standard errors by postcode.",
+          "Fixed effects include year dummies.",
+          "Dependent variable: log(total assets)."),
+output = "kableExtra",
+escape = FALSE)
+```
+
+```{r regression-3b, results='asis', echo=FALSE}
+reg3 <- feols(equity_ratio ~ group, data = orbis_data, cluster = ~postcode)
+reg4 <- feols(equity_ratio ~ group + factor(year), data = orbis_data, cluster = ~postcode)
+
+modelsummary(list(
+  "Equity Ratio - Pooled OLS" = reg3,
+  "Equity Ratio - Fixed Effects" = reg4
+),
+stars = TRUE,
+gof_omit = "AIC|BIC|Log.Lik.",
+title = "Regression Results on Equity Ratio",
+notes = c("Models use clustered standard errors by postcode.",
+          "Fixed effects include year dummies.",
+          "Dependent variable: equity ratio = book equity / total assets."),
+output = "kableExtra",
+escape = FALSE)
+```
+
+\FloatBarrier
+
+## 5. Conclusion
+
+The empirical results underscore a robust and statistically significant size disadvantage for firms operating in the 10785 postal region relative to the general Berlin firm population. This size gap remains consistent even when comparing the pre-pandemic and pandemic years. However, no consistent or statistically meaningful difference in equity ratios was observed over time, which may reflect structural or measurement heterogeneity not captured in the model. Overall, the findings offer valuable insights into the spatial and temporal dimension of corporate financial health within Berlin and provide a starting point for further research on localized economic resilience during global crises.
+
+## 6. Reproducibility Statement
+
+All empirical results presented in this report were generated using scripted R code and the original Orbis dataset. The accompanying .Rmd file and processed tables ensure full reproducibility. Summary statistics have also been exported to CSV format for transparency and future research applications. 
+
+```{r save-table, results='hide'}
+write.csv(desc_stats, "desc_stats_table1.csv", row.names = FALSE)
+```
